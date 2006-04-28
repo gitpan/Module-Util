@@ -3,7 +3,7 @@ package Module::Util;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 NAME
 
@@ -15,10 +15,12 @@ Module::Util - Module name tools and transformations
 
     $valid = is_valid_module_name $potential_module;
 
-    $rel_ath = module_path $module_name;
+    $relative_path = module_path $module_name;
+
+    $file_system_path = module_fs_path $module_name;
 
     # load module at runtime
-    require $rel_path;
+    require module_path $module_name;
 
     # (see perldoc -f require for limitations of this approach.)
 

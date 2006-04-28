@@ -4,7 +4,9 @@ use warnings;
 use File::Spec::Functions qw( catdir );
 use Test::More tests => 3;
 
-BEGIN { use_ok('Module::Util', qw( find_installed module_fs_path )) }
+BEGIN {
+    use_ok('Module::Util', qw( find_installed module_fs_path ));
+}
 
 SKIP: {
     eval {

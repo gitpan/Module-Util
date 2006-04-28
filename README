@@ -6,10 +6,12 @@ SYNOPSIS
 
         $valid = is_valid_module_name $potential_module;
 
-        $rel_ath = module_path $module_name;
+        $relative_path = module_path $module_name;
+
+        $file_system_path = module_fs_path $module_name;
 
         # load module at runtime
-        require $rel_path;
+        require module_path $module_name;
 
         # (see perldoc -f require for limitations of this approach.)
 
