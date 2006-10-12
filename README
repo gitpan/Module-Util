@@ -151,7 +151,11 @@ SEE ALSO
     pm_which, a command-line utility for finding installed perl modules that
     is bundled with this module.
 
-    Module::Info, Module::Require, UNIVERSAL::require, Module::Runtime
+    Other, similar CPAN modules:
+
+    Class::Inspector, Module::Info,
+
+    Module::Require, UNIVERSAL::require, Module::Runtime
 
     perldoc -f require
 

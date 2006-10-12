@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use File::Spec::Functions qw( catfile );
-use Test::More tests => 44;
+use File::Spec::Functions qw( catfile catdir );
+use Test::More tests => 42;
 
-our $module = "Module::Util";
+our $module;
 BEGIN {
     $module = "Module::Util";
     use_ok($module, qw( :all ));
@@ -58,40 +58,30 @@ is(all_installed("::Invalid"), 0, "::Invalid is not installed at all");
 SKIP: {
     # These tests require File::Find::Rule
     eval { require File::Find::Rule };
-    if ($@) {
-        skip('File::Find::Rule not installed', 2 + @invalid);
-    }
-    else {
-        my @in_ns;
-        @in_ns = find_in_namespace('NS', 't/data');
-        is_deeply(\@in_ns, ['NS::One'], 'find_in_namespace');
+    skip('File::Find::Rule not installed', 2 + @invalid) if $@;
 
-        @in_ns = find_in_namespace('', 't/data');
-        is_deeply(\@in_ns, ['NS::One'], 'find_in_namespace');
+    my @in_ns;
+    my $dir = catdir(qw( t data ));
+    @in_ns = find_in_namespace('NS', $dir);
+    is_deeply(\@in_ns, ['NS::One'], 'find_in_namespace');
 
-        for my $invalid (@invalid) {
-            ok(
-                !find_in_namespace($invalid),
-                "'$invalid' is not a valid namespace"
-            );
-        }
+    @in_ns = find_in_namespace('', $dir);
+    is_deeply(\@in_ns, ['NS::One'], 'find_in_namespace');
+
+    for my $invalid (@invalid) {
+        ok(!find_in_namespace($invalid), "'$invalid' is not a valid namespace");
     }
 }
 
 $path = catfile('lib', module_fs_path($module)) || '';
 ok(-f $path, "'$path' exists");
 
+# path_to_module should fail when given a module name
 ok(!path_to_module($module), "path_to_module($module) fails");
+
+# should fail on an absolute path too.
 $path = find_installed($module) || '';
 ok(!path_to_module($path), "path_to_module($path) fails");
-
-unshift @INC, sub { my ($self, $file) = @_; die "$file\n" };
-
-eval { require '::Invalid::' };
-like($@, qr(^::Invalid::), "sub in \@INC was called by require");
-
-eval { find_installed('Module::Util') };
-ok(!$@, '.. but not by find_installed');
 
 __END__
 

@@ -3,7 +3,7 @@ package Module::Util;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -198,7 +198,7 @@ sub find_in_namespace ($;@) {
         my $ns_root = rel2abs($ns_path, $root);
 
         for my $path ($rule->in($ns_root)) {
-            my $rel_path = abs2rel($path, $root);
+            my $rel_path = abs2rel($path, rel2abs($root));
             push @out, fs_path_to_module($rel_path);
         }
     }
@@ -368,7 +368,11 @@ None known. Please report any found.
 L<pm_which>, a command-line utility for finding installed perl modules that is
 bundled with this module.
 
-L<Module::Info>, L<Module::Require>, L<UNIVERSAL::require>, L<Module::Runtime>
+Other, similar CPAN modules:
+
+L<Class::Inspector>, L<Module::Info>,
+
+L<Module::Require>, L<UNIVERSAL::require>, L<Module::Runtime>
 
 perldoc -f require
 
