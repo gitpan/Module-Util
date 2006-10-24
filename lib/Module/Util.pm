@@ -3,7 +3,7 @@ package Module::Util;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =head1 NAME
 
@@ -171,7 +171,10 @@ default).
 
     find_in_namespace("My::Namespace");
 
-The use of this method requires File::Find::Rule to be installed.
+The use of this function requires File::Find::Rule to be installed.
+
+Returns unique installed module names under the namespace. Note that this does
+not include the passed-in name, even if it is the name of an installed module.
 
 Use of an empty string as the namespace returns all modules in @inc.
 
@@ -184,7 +187,7 @@ sub find_in_namespace ($;@) {
 
     if ($ns ne '') {
         $ns_path = module_fs_path($ns) or return;
-        $ns_path =~ s/\.pm//;
+        $ns_path =~ s/\.pm$//;
     }
     else {
         $ns_path = '';
@@ -203,7 +206,8 @@ sub find_in_namespace ($;@) {
         }
     }
 
-    return @out;
+    my %seen;
+    return grep { !$seen{$_}++ } @out;
 }
 
 # munge a module name into multiple possible installed locations

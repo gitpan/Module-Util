@@ -1,5 +1,9 @@
 Changes document for Module::Util
 
+1.03
+	- Added -V switch to pm_which, to display versions
+        - Made find_in_namespace return unique module names
+
 1.02 - Thu Oct 12 2006
 	- Fixed version numbers in this file.
         - Added a work around for  a potential bug in find_in_namespace on

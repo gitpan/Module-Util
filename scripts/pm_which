@@ -28,8 +28,9 @@ pm_which - find installed modules
     -q, --quiet     Just print paths
     -p, --paths     Just convert the module name into a relative path
     -a, --all       Print all paths, not just the first one found
-    -n, --namspace  Print all modules in the given namespace
+    -n, --namespace Print all modules in the given namespace
     -m              Only print module names, not paths
+    -V              Show module version
     -I libpath      Add a path to search (like perl -I)
     -d, --dump      Dump paths that would be searched (@INC by default)
     -h, --help      Print this message
@@ -38,7 +39,7 @@ pm_which - find installed modules
   
 =cut
 
-our($quiet, $all, $namespace, $name_only, $paths, $dump, $stdin);
+our($quiet, $all, $namespace, $name_only, $paths, $dump, $stdin, $version);
 our @search = @INC;
 
 GetOptions(
@@ -48,6 +49,7 @@ GetOptions(
     'd|dump'        => \$dump,
     'n|namespace'   => \$namespace,
     'm'             => \$name_only,
+    'V'             => \$version,
     ''              => \$stdin,
     'h|help'        => sub { pod2usage(-exitval => 0) },
     'I=s'           => sub { unshift @search, $_[1] },
@@ -58,6 +60,8 @@ if ($dump) {
     print join("\n", @search), "\n";
     exit 0;
 }
+
+require ExtUtils::MakeMaker if $version;
 
 our @modules = @ARGV;
 
@@ -91,8 +95,10 @@ if ($namespace) {
     @modules = @found;
 }
 
-if ($name_only) {
-    print "$_\n" for @modules;
+# We can just print and exit if we're just interested in module names.
+# However, if we also want versions, we have to get the path(s) anyway.
+if ($name_only and not $version) {
+    print map { "$_\n" } @modules;
     exit 0;
 }
 
@@ -127,13 +133,26 @@ for my $module (@modules) {
                      ;
 
     my $prefix = '';
-    unless ($quiet or @modules == 1) {
+    unless ($quiet or @modules == 1 or $name_only) {
         # print the module name as well as the path
         $prefix = sprintf("%-${width}s - ", $module);
     }
 
     if (@paths) {
         for my $path (@paths) {
+            if ($version) {
+                my $version = eval { MM->parse_version($path) };
+                if ($@) {
+                    warn "$0: Error finding version for '$module': $@\n";
+                    $exit = 2;
+                }
+
+                # We might not want to display the path
+                $path = $module if $name_only;
+
+                $path .= defined $version ? " [ $version ]" : '';
+            }
+
             print $prefix, $path, "\n";
         }
     }
@@ -217,6 +236,18 @@ Disables printing of module paths. This is only really useful in conjunction wit
     MyModule::Foo
     MyModule::Foo::Bar
 
+=head2 -V
+
+Prints the version of each module, according to L<ExtUtils::MakeMaker>.
+
+    $ pm_which -V MyModule
+    MyModule - /path/to/MyModule.pm [ 1.00 ]
+
+    $ pm_which -Vnm MyModule
+    MyModule [ 1.00 ]
+    MyModule::Foo [ 0.01 ]
+    MyModule::Foo::Bar [ undef ]
+
 =head2 dump
 
 Dumps the paths that would be searched and exits. This is @INC modified by any
@@ -240,7 +271,7 @@ Module::Util that was loaded.
 
 =head1 EXIT CODES
 
-=over 4
+=over
 
 =item * 0 - Everything was OK
 
