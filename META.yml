@@ -1,6 +1,6 @@
 ---
 name: Module-Util
-version: 1.04
+version: 1.05
 author:
   - 'Matt Lawrence E<lt>mattlaw@cpan.orgE<gt>'
 abstract: Module name tools and transformations
@@ -14,7 +14,7 @@ build_requires:
 provides:
   Module::Util:
     file: lib/Module/Util.pm
-    version: 1.04
+    version: 1.05
 generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
