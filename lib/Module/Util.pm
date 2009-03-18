@@ -3,7 +3,7 @@ package Module::Util;
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 =head1 NAME
 
@@ -35,6 +35,7 @@ paths.
 
 use Exporter;
 use File::Spec::Functions qw( catfile rel2abs abs2rel splitpath splitdir );
+use File::Find;
 
 =head1 EXPORTS
 
@@ -207,7 +208,8 @@ sub find_in_namespace ($;@) {
 sub _find_modules {
     my @roots = @_;
 
-    require File::Find;
+    # versions of File::Find from earlier perls don't have this feature
+    BEGIN { unimport warnings qw( File::Find ) if $] >= 5.008 }
 
     my @out;
     File::Find::find({
