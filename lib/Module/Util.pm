@@ -3,7 +3,7 @@ package Module::Util;
 use strict;
 use warnings;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 =encoding UTF-8
 
@@ -63,6 +63,7 @@ our @EXPORT_OK = qw(
     path_to_module
     fs_path_to_module
     canonical_module_name
+    module_name_parts
 );
 
 our %EXPORT_TAGS = (
@@ -339,9 +340,7 @@ If the module name is invalid, nothing is returned.
 sub module_path_parts ($) {
     my $module = shift;
 
-    $module = canonical_module_name($module) or return;
-
-    my @parts = split($SEPARATOR, $module);
+    my @parts = module_name_parts($module) or return;
     $parts[-1] .= '.pm';
 
     return @parts;
@@ -371,6 +370,24 @@ sub canonical_module_name ($) {
     return $module;
 }
 
+=head2 module_name_parts
+
+    @parts = module_name_parts($module);
+
+Returns a list of name parts for the given module.
+
+    module_name_parts('Acme::Example); # ('Acme', 'Example')
+
+=cut
+
+sub module_name_parts ($) {
+    my $module = shift;
+
+    $module = canonical_module_name($module) or return;
+
+    return split($SEPARATOR, $module);
+}
+
 1;
 
 __END__
@@ -398,7 +415,7 @@ Matt Lawrence E<lt>mattlaw@cpan.orgE<gt>
 
 =head1 THANKS
 
-Alexander Kühne and Adrian Lai for submitting patches.
+Alexander Kühne, Adrian Lai and Daniel Lukasiak for submitting patches.
 
 =head1 COPYRIGHT
 
